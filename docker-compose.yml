@@ -24,6 +24,8 @@ services:
 
   db:
     image: postgres:13-alpine
+    ports:
+      - "5432:5432"  # 👈 expose the database port so Adminer or external tools can access it
     volumes:
       - dev-db-data:/var/lib/postgresql/data
     environment:
@@ -31,5 +33,10 @@ services:
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=changeme
 
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"  # 👈 Adminer will be accessible at http://localhost:8080
+
 volumes:
-  dev-db-data: 
+  dev-db-data:
