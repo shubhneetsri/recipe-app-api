@@ -19,8 +19,10 @@ services:
       - DB_NAME=devdb
       - DB_USER=devuser
       - DB_PASS=changeme
+      - REDIS_URL=redis://redis:6379/0
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:13-alpine
@@ -32,6 +34,28 @@ services:
       - POSTGRES_DB=devdb
       - POSTGRES_USER=devuser
       - POSTGRES_PASSWORD=changeme
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: .
+    command: celery -A app.celery_app worker --loglevel=info
+    volumes:
+      - ./app:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - db
+
 
   adminer:
     image: adminer
